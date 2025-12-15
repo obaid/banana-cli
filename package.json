@@ -1,5 +1,5 @@
 {
-  "name": "banana-cli",
+  "name": "@obaidahmed/banana-cli",
   "version": "1.0.0",
   "description": "A CLI tool for generating images using Google Gemini's image generation API",
   "main": "dist/index.js",

@@ -62,7 +62,7 @@ A powerful CLI tool for generating and modifying images using Google Gemini's im
 Install globally to use the `banana` command anywhere:
 
 ```bash
-npm install -g banana-cli
+npm install -g @obaidahmed/banana-cli
 ```
 
 ### Local Installation
@@ -70,13 +70,13 @@ npm install -g banana-cli
 Install as a project dependency:
 
 ```bash
-npm install banana-cli
+npm install @obaidahmed/banana-cli
 ```
 
 Then run via npx:
 
 ```bash
-npx banana -i "your prompt here"
+npx @obaidahmed/banana-cli -i "your prompt here"
 ```
 
 ### Verify Installation
@@ -359,7 +359,7 @@ banana -i "Place this product on a marble countertop" \
 
 1. **Install banana-cli globally:**
    ```bash
-   npm install -g banana-cli
+   npm install -g @obaidahmed/banana-cli
    ```
 
 2. **Set your API key:**
@@ -389,14 +389,14 @@ banana -i "Place this product on a marble countertop" \
    }
    ```
 
-   Or if using npx:
+   Or if using npx (without global install):
 
    ```json
    {
      "mcpServers": {
        "banana": {
          "command": "npx",
-         "args": ["-y", "banana-cli", "banana-mcp"],
+         "args": ["-y", "@obaidahmed/banana-cli", "banana-mcp"],
          "env": {
            "GEMINI_API_KEY": "your-api-key-here"
          }
@@ -421,7 +421,7 @@ banana -i "Place this product on a marble countertop" \
 
 1. **Install banana-cli:**
    ```bash
-   npm install -g banana-cli
+   npm install -g @obaidahmed/banana-cli
    ```
 
 2. **Add to Gemini CLI settings** (`~/.gemini/settings.json`):
