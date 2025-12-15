@@ -1,8 +1,7 @@
 import { Command } from "commander";
-import { writeFile, readFile } from "fs/promises";
-import { resolve, dirname, basename, extname } from "path";
-import { mkdir } from "fs/promises";
-import { existsSync } from "fs";
+import { writeFile, readFile, mkdir } from "node:fs/promises";
+import { resolve, dirname, basename, extname } from "node:path";
+import { existsSync } from "node:fs";
 import {
   generateImage,
   validateApiKey,

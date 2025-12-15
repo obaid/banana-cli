@@ -14,11 +14,9 @@ import {
   ListToolsRequestSchema,
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
-import { readFile } from "fs/promises";
-import { resolve } from "path";
-import { existsSync } from "fs";
-import { writeFile, mkdir } from "fs/promises";
-import { dirname } from "path";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { resolve, dirname } from "node:path";
+import { existsSync } from "node:fs";
 
 import {
   generateImage,
