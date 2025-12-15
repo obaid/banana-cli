@@ -4,7 +4,8 @@
   "description": "A CLI tool for generating images using Google Gemini's image generation API",
   "main": "dist/index.js",
   "bin": {
-    "banana": "./dist/index.js"
+    "banana": "./dist/index.js",
+    "banana-mcp": "./dist/mcp-server.js"
   },
   "type": "module",
   "scripts": {
@@ -28,6 +29,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "commander": "^12.1.0"
   },
   "devDependencies": {
@@ -45,6 +47,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/banana-cli"
+    "url": "https://github.com/obaid/banana-cli"
   }
 }

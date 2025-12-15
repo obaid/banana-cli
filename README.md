@@ -26,10 +26,12 @@ A powerful CLI tool for generating and modifying images using Google Gemini's im
   - [Basic Examples](#basic-examples)
   - [Advanced Examples](#advanced-examples)
   - [Image Modification Examples](#image-modification-examples)
-- [Integration with AI Tools](#integration-with-ai-tools)
-  - [Claude Code](#claude-code)
-  - [Gemini CLI](#gemini-cli)
-  - [Custom MCP Server](#custom-mcp-server)
+- [MCP Server](#mcp-server-model-context-protocol)
+  - [Setup for Claude Code](#setup-for-claude-code)
+  - [Setup for Gemini CLI](#setup-for-gemini-cli)
+  - [Setup for Codex / Other Tools](#setup-for-openai-codex--other-tools)
+  - [MCP Tool Schemas](#mcp-tool-schemas)
+- [Direct CLI Usage with AI Tools](#direct-cli-usage-with-ai-tools)
 - [Programmatic Usage](#programmatic-usage)
 - [Error Handling](#error-handling)
 - [Troubleshooting](#troubleshooting)
@@ -342,91 +344,210 @@ banana -i "Place this product on a marble countertop" \
 
 ---
 
-## Integration with AI Tools
+## MCP Server (Model Context Protocol)
 
-`banana-cli` is designed to be used as a tool by AI assistants and automation pipelines.
+`banana-cli` includes a built-in MCP server that exposes image generation as tools for AI assistants. This allows Claude Code, Gemini CLI, and other MCP-compatible tools to generate and modify images.
 
-### Claude Code
+### MCP Tools Available
 
-Add to your Claude Code MCP configuration:
+| Tool | Description |
+|------|-------------|
+| `generate_image` | Generate an image from a text description |
+| `modify_image` | Modify an existing image based on instructions |
+
+### Setup for Claude Code
+
+1. **Install banana-cli globally:**
+   ```bash
+   npm install -g banana-cli
+   ```
+
+2. **Set your API key:**
+   ```bash
+   export GEMINI_API_KEY="your-api-key-here"
+   ```
+
+3. **Add to Claude Code settings:**
+
+   Open your Claude Code settings file:
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+   - **Linux**: `~/.config/Claude/claude_desktop_config.json`
+
+   Add the banana MCP server:
+
+   ```json
+   {
+     "mcpServers": {
+       "banana": {
+         "command": "banana-mcp",
+         "env": {
+           "GEMINI_API_KEY": "your-api-key-here"
+         }
+       }
+     }
+   }
+   ```
+
+   Or if using npx:
+
+   ```json
+   {
+     "mcpServers": {
+       "banana": {
+         "command": "npx",
+         "args": ["-y", "banana-cli", "banana-mcp"],
+         "env": {
+           "GEMINI_API_KEY": "your-api-key-here"
+         }
+       }
+     }
+   }
+   ```
+
+4. **Restart Claude Code** to load the new MCP server.
+
+5. **Use in conversations:**
+   ```
+   You: Generate an image of a cute robot cooking pasta
+
+   Claude: I'll generate that image for you using the banana tool.
+   [Uses generate_image tool]
+
+   Image generated successfully: /path/to/generated_1234567890.png
+   ```
+
+### Setup for Gemini CLI
+
+1. **Install banana-cli:**
+   ```bash
+   npm install -g banana-cli
+   ```
+
+2. **Add to Gemini CLI settings** (`~/.gemini/settings.json`):
+
+   ```json
+   {
+     "mcpServers": {
+       "banana": {
+         "command": "banana-mcp",
+         "env": {
+           "GEMINI_API_KEY": "your-api-key-here"
+         }
+       }
+     }
+   }
+   ```
+
+### Setup for OpenAI Codex / Other Tools
+
+For tools that support MCP servers, use similar configuration:
 
 ```json
 {
   "mcpServers": {
     "banana": {
-      "command": "banana",
-      "args": ["-i", "${prompt}", "-o", "${output}"]
+      "command": "banana-mcp",
+      "env": {
+        "GEMINI_API_KEY": "your-api-key-here"
+      }
     }
   }
 }
 ```
 
-Or use directly in Claude Code conversations:
+### MCP Tool Schemas
+
+#### generate_image
+
+```json
+{
+  "name": "generate_image",
+  "description": "Generate an image from a text description",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "prompt": {
+        "type": "string",
+        "description": "Text description of the image to generate"
+      },
+      "output": {
+        "type": "string",
+        "description": "Output file path (optional)"
+      },
+      "model": {
+        "type": "string",
+        "enum": ["gemini-2.0-flash-exp", "imagen-3.0-generate-002"]
+      },
+      "aspectRatio": {
+        "type": "string",
+        "enum": ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"]
+      },
+      "size": {
+        "type": "string",
+        "enum": ["1K", "2K", "4K"]
+      }
+    },
+    "required": ["prompt"]
+  }
+}
+```
+
+#### modify_image
+
+```json
+{
+  "name": "modify_image",
+  "description": "Modify an existing image based on instructions",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "prompt": {
+        "type": "string",
+        "description": "Instructions for modifying the image"
+      },
+      "inputImage": {
+        "type": "string",
+        "description": "Path to the input image file"
+      },
+      "output": {
+        "type": "string",
+        "description": "Output file path (optional)"
+      },
+      "model": {
+        "type": "string",
+        "enum": ["gemini-2.0-flash-exp", "imagen-3.0-generate-002"]
+      }
+    },
+    "required": ["prompt", "inputImage"]
+  }
+}
+```
+
+### Testing the MCP Server
+
+You can test the MCP server manually:
+
+```bash
+# Start the server (it communicates via stdin/stdout)
+GEMINI_API_KEY="your-key" banana-mcp
+
+# The server will wait for JSON-RPC messages on stdin
+```
+
+---
+
+## Direct CLI Usage with AI Tools
+
+You can also use the CLI directly without MCP:
+
+### Claude Code (Direct)
 
 ```
 You: Generate an image of a robot chef and save it as robot-chef.png
 
 Claude: I'll generate that image for you.
 > banana -i "A friendly robot chef wearing an apron, cooking in a modern kitchen" -o robot-chef.png
-```
-
-### Gemini CLI
-
-Use in Gemini CLI tool configurations:
-
-```json
-{
-  "tools": [
-    {
-      "name": "generate_image",
-      "description": "Generate an image from a text description",
-      "command": "banana -i \"{{prompt}}\" -o \"{{filename}}\""
-    },
-    {
-      "name": "modify_image",
-      "description": "Modify an existing image based on instructions",
-      "command": "banana -i \"{{instructions}}\" --image \"{{input}}\" -o \"{{output}}\""
-    }
-  ]
-}
-```
-
-### Custom MCP Server
-
-Example MCP tool definition:
-
-```typescript
-const generateImageTool = {
-  name: "generate_image",
-  description: "Generate an image using Google Gemini's image generation API",
-  inputSchema: {
-    type: "object",
-    properties: {
-      prompt: {
-        type: "string",
-        description: "Text description of the image to generate"
-      },
-      output: {
-        type: "string",
-        description: "Output filename (e.g., 'image.png')"
-      },
-      aspectRatio: {
-        type: "string",
-        enum: ["1:1", "16:9", "9:16", "4:3", "3:4"],
-        description: "Aspect ratio of the output image"
-      }
-    },
-    required: ["prompt"]
-  },
-  handler: async ({ prompt, output, aspectRatio }) => {
-    const args = ["-i", prompt];
-    if (output) args.push("-o", output);
-    if (aspectRatio) args.push("-a", aspectRatio);
-
-    const result = execSync(`banana ${args.join(" ")}`);
-    return result.toString();
-  }
-};
 ```
 
 ### Shell Scripts & Automation
@@ -545,7 +666,7 @@ generateImage('A cute cat', 'cat.png');
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/banana-cli.git
+git clone https://github.com/obaid/banana-cli.git
 cd banana-cli
 
 # Install dependencies
@@ -683,8 +804,8 @@ SOFTWARE.
 
 ## Support
 
-- **Issues:** [GitHub Issues](https://github.com/yourusername/banana-cli/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/yourusername/banana-cli/discussions)
+- **Issues:** [GitHub Issues](https://github.com/obaid/banana-cli/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/obaid/banana-cli/discussions)
 
 ---
 
