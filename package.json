@@ -1,0 +1,50 @@
+{
+  "name": "banana-cli",
+  "version": "1.0.0",
+  "description": "A CLI tool for generating images using Google Gemini's image generation API",
+  "main": "dist/index.js",
+  "bin": {
+    "banana": "./dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "tsx tests/integration/run-tests.ts",
+    "test:integration:quick": "tsx tests/integration/quick-test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "gemini",
+    "google",
+    "ai",
+    "image-generation",
+    "cli",
+    "nano-banana"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/banana-cli"
+  }
+}
